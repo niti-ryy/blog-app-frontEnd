@@ -1,66 +1,9 @@
 
-// import React from 'react';
-// import { useFormik } from 'formik';
-// import * as Yup from 'yup';
-
-// const Register = () => {
-//   const formik = useFormik({
-//     initialValues: {
-//       email: '',
-//       password: '',
-//     },
-//     validationSchema: Yup.object({
-//       email: Yup.string().email('Invalid email address').required('Email is required'),
-//       password: Yup.string()
-//         .required('Password is required')
-//         .min(10, 'Password should be greater than 10 characters'),
-//     }),
-//     onSubmit: (values) => {
-//       console.log(values);
-//     },
-//   });
-
-//   return (
-//     <div>
-//       <form onSubmit={formik.handleSubmit}>
-//         <label htmlFor="email">Email Address</label>
-//         <br />
-//         <input
-//           id="email"
-//           type="email" // Change type to "email"
-//           {...formik.getFieldProps('email')}
-//         />
-//         <br />
-//         {formik.touched.email && formik.errors.email ? (
-//           <p>{formik.errors.email}</p>
-//         ) : null}
-//         <label htmlFor="password">Enter your password </label>
-//         <br />
-//         <input
-//           id="password"
-//           type="password" // Change type to "password"
-//           {...formik.getFieldProps('password')}
-//         />
-//         <br />
-//         {formik.touched.password && formik.errors.password ? (
-//           <p>{formik.errors.password}</p>
-//         ) : null}
-//         <input type="submit" />
-//         <br />
-//       </form>
-//     </div>
-//   );
-// };
-
-
-
-
-// export default Register
 import React from 'react'
-import validator from "validator"
 import * as Yup from "yup"
 import {Formik} from "formik"
 import {isStrongPassword} from "validator"
+import axios from "axios"
 const Register = () => {
   return (
     <div>
@@ -80,22 +23,30 @@ const Register = () => {
             bio:Yup.string().required("bio is required")    
         })}
         onSubmit={(values,{setSubmitting})=>{
-            setTimeout(()=>{
-                alert(values.email)
-                setSubmitting(false)
-            },1000)
+            const formData={
+                username:values.username,
+                email:values.email,
+                passwordHash:values.password,
+                bio:values.bio,
+                createAt:Date.now(),
+            }
+            axios.post("http://localhost:3046/api/users/register",formData)
+            .then((res)=>{console.log(res.data)})
+            .catch((e)=>{alert(e.message)})
+            setSubmitting(false)
+            
         }}>
             {formik=>(
                 <form onSubmit={formik.handleSubmit}>
                     <label htmlFor="username">Username</label><br/>
-                    <input type="username" id="username" {...formik.getFieldProps("username")}/><br/>
+                    <input type="text" id="username" {...formik.getFieldProps("username")}/><br/>
                     {formik.touched.username && formik.errors.username ?(
                         <div>
                             <p>{formik.errors.username}</p><br/>
                         </div>
                     ):null}
                     <label htmlFor="email">Enter your email</label><br/>
-                    <input type="email" id="email" {...formik.getFieldProps("email")}/><br/>
+                    <input type="text" id="email" {...formik.getFieldProps("email")}/><br/>
                     {formik.touched.email && formik.errors.email ?(
                         <div>
                             <p>{formik.errors.email}</p><br/>
@@ -109,13 +60,13 @@ const Register = () => {
                         </div>
                     ):null}
                     <label htmlFor="bio">Bio</label><br/>
-                    <textarea type="bio" id="bio" {...formik.getFieldProps("bio")}/><br/>
+                    <textarea type="text" id="bio" {...formik.getFieldProps("bio")}/><br/>
                     {formik.touched.bio && formik.errors.bio ?(
                         <div>
                             <p>{formik.errors.bio}</p><br/>
                         </div>
                     ):null}
-                    
+                    <input type="submit"/>
                 </form>
             )}
        </Formik>
